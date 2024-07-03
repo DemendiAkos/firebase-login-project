@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { auth } from '../firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth, googleProvider } from '../firebase';
+import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
@@ -19,6 +19,17 @@ const Login: React.FC = () => {
       }
     };
     
+    const handleGoogleLogin = async () => {
+        try {
+            await signInWithPopup(auth, googleProvider);
+            alert("Login successful");
+            navigate('/profile');
+        } catch (error: any) {
+            alert(error.message);
+        }
+    };
+
+
     const goSignUp = () => {
         navigate('/signup')
     };
@@ -31,6 +42,7 @@ const Login: React.FC = () => {
           <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
           <button type="submit">Login</button>
         </form>
+        <button onClick={handleGoogleLogin}>Login with Google</button>
         <h3>Don't have an account?</h3>
         <button onClick={goSignUp}>Sign Up!</button>
       </div>
