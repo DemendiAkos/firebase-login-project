@@ -13,6 +13,7 @@ const Login: React.FC = () => {
       try {
         await signInWithEmailAndPassword(auth, email, password);
         alert("Login successful");
+        navigate('/profile');
       } catch (error: any) {
         alert(error.message);
       }
@@ -21,7 +22,7 @@ const Login: React.FC = () => {
     const goSignUp = () => {
         navigate('/signup')
     };
-    
+
     return (
       <div>
         <h1>Login</h1>
