@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 const Profile: React.FC = () => {
     const [user, setUser] = useState<any>(null);
+    const [username, SetUsername] = useState<any>(null);
     const [age, setAge] = useState<string>('');
     const [weight, setWeight] = useState<string>('');
     const [height, setHeight] = useState<string>('');
@@ -32,6 +33,7 @@ const Profile: React.FC = () => {
         if (docSnap.exists()) {
             const data = docSnap.data();
             console.log('User data:', data);
+            SetUsername(data.username || '');
             setAge(data.age || '');
             setWeight(data.weight || '');
             setHeight(data.height || '');
@@ -46,7 +48,7 @@ const Profile: React.FC = () => {
         if (user) {
             try {
                 const docRef = doc(db, 'users', user.uid);
-                await setDoc(docRef, { age, weight, height }, { merge: true });
+                await setDoc(docRef, {username, age, weight, height }, { merge: true });
                 alert('Profile updated successfully');
             } catch (error: any) {
                 console.error('Error updating profile:', error);
@@ -55,15 +57,40 @@ const Profile: React.FC = () => {
         }
     };
 
+    const handleLogOut = async () => {
+        try {
+            await signOut(auth);
+            navigate('/login');
+        } catch (error: any) {
+            console.error('Error logging out:', error);
+            alert('Error logging out:' + error.message);
+        }
+    }
+
     return (
         <div>
-            <h1>Profile</h1>
+            <h1>Welcome!</h1>
+            <h1>{username}</h1>
             <form onSubmit={handleSave}>
-                <input type="text" placeholder="Age" value={age} onChange={(e) => setAge(e.target.value)} />
-                <input type="text" placeholder="Weight" value={weight} onChange={(e) => setWeight(e.target.value)} />
-                <input type="text" placeholder="Height" value={height} onChange={(e) => setHeight(e.target.value)} />
+                <div>
+                    <label>Username:</label>
+                    <input type="text" placeholder='Username' value={username} onChange={(e) => SetUsername(e.target.value)} />
+                </div>
+                <div>
+                    <label>Age:</label>
+                    <input type="text" placeholder="Age" value={age} onChange={(e) => setAge(e.target.value)} />
+                </div>
+                <div>
+                    <label>Weight:</label>
+                    <input type="text" placeholder="Weight" value={weight} onChange={(e) => setWeight(e.target.value)} />
+                </div>
+                <div>
+                    <label>Height:</label>
+                    <input type="text" placeholder="Height" value={height} onChange={(e) => setHeight(e.target.value)} />
+                </div>
                 <button type="submit">Save</button>
             </form>
+            <button onClick={handleLogOut}>Log Out</button>
         </div>
     );
 };
